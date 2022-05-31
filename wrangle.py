@@ -1,10 +1,28 @@
-# wrangle
-from acquire import get_zillow_data
 import pandas as pd
-import numpy as np
+import os
+from env import get_db_url
 
-import warnings
-warnings.filterwarnings("ignore")
+###### ACQUIRE ###########
+
+def get_zillow_data():
+    filename = 'zillow_data.csv'
+
+    if os.path.isfile(filename):
+        return pd.read_csv(filename, index_col=0)
+    else:
+        df = pd.read_sql(
+            '''
+            SELECT bedroomcnt, bathroomcnt, calculatedfinishedsquarefeet, taxvaluedollarcnt, yearbuilt, taxamount, fips FROM properties_2017 WHERE propertylandusetypeid = 261; 
+            '''
+            ,
+            get_db_url('zillow')
+        )
+
+        df.to_csv(filename)
+
+        return df
+######### PREPARE #############
+
 
 def wrangle_zillow():
     '''
