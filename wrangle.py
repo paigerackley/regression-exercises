@@ -1,6 +1,11 @@
 import pandas as pd
+import numpy as np
 import os
+
 from env import get_db_url
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 
 #### ACQUIRE ######
 
@@ -34,7 +39,7 @@ def get_new_zillow_data():
 
 
 ### SPLIT #####
-def train_validate_test_split(df, target, seed=123):
+def train_validate_test_split(df, seed=123):
     '''
     This function takes in a dataframe, the name of the target variable, and an integer for a setting a seed
     and splits the data into train, validate and test.
@@ -53,8 +58,7 @@ def train_validate_test_split(df, target, seed=123):
 def scale_data(train, 
                validate, 
                test, 
-               columns_to_scale=['bedroomcnt', 'bathroomcnt', 'taxvaluedollarcnt', 'calculatedfinishedsquarefeet'],
-               return_scaler=False):
+               columns_to_scale=['bedroomcnt', 'bathroomcnt', 'taxvaluedollarcnt', 'square_feet']):
     '''
     Scales the 3 data splits. 
     Takes in train, validate, and test data splits and returns their scaled counterparts.
@@ -76,10 +80,8 @@ def scale_data(train,
     test_scaled[columns_to_scale] = pd.DataFrame(scaler.transform(test[columns_to_scale]),
                                                  columns=test[columns_to_scale].columns.values).set_index([test.index.values])
     
-    if return_scaler:
-        return scaler, train_scaled, validate_scaled, test_scaled
-    else:
-        return train_scaled, validate_scaled, test_scaled
+
+    return train_scaled, validate_scaled, test_scaled
 
 
 
@@ -125,5 +127,18 @@ def wrangle_zillow():
     df = df.drop(columns = 'fips')
 
     return df
+
+
+
+
+###### All Together #######
+def wrangle_split_scale():
+    
+    df = wrangle_zillow()
+    train, validate, test = train_validate_test_split(df)
+    train_scaled, validate_scaled, test_scaled = scale_data(train, validate, test)
+    
+    return train_scaled, validate_scaled, test_scaled
+
 
 
