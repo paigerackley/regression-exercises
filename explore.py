@@ -13,15 +13,14 @@ def plot_variable_pairs(df,
         sns.lmplot(x=pair[0], y=pair[1], data=df.sample(sampling), line_kws={'color': 'blue'})
         plt.show()
 
-plot_variable_pairs(train)
-
 
 
 
 
 def plot_categorical_and_continuous_vars(df,
                                          columns_cat=['fips_name'],
-                                         columns_cont=['square_feet', 'yearbuilt', 'bedroomcnt', 'bathroomcnt', 'taxvaluedollarcnt', 'taxamount'],
+                                         columns_cont=['square_feet', 'yearbuilt', 'bedroomcnt', 'bathroomcnt', 
+                                         'taxvaluedollarcnt', 'taxamount'],
                                          sampling = 1000):
     pairs = product(columns_cat, columns_cont)
     for pair in pairs:
@@ -33,5 +32,3 @@ def plot_categorical_and_continuous_vars(df,
         sns.barplot(x=pair[0], y=pair[1], data=df.sample(sampling), ax = axes[2])
 
         plt.show
-
-plot_categorical_and_continuous_vars(train, sampling = 10_000)
