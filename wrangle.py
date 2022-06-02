@@ -109,6 +109,8 @@ def wrangle_zillow():
 
     # readability
     df = df.rename(columns={'calculatedfinishedsquarefeet': 'square_feet'})
+    df = df.rename(columns={'landtaxvaluedollarcnt': 'land_value', 'lotsizesquarefeet': 'lot_square_feet', 'regionidzip': 'zipcode'}, inplace=True) 
+
 
     # Eliminate the funky values
     df = df[df['square_feet'] > 400]
