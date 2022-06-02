@@ -108,8 +108,7 @@ def wrangle_zillow():
     df = df.dropna()
 
     # readability
-    df = df.rename(columns={'calculatedfinishedsquarefeet': 'square_feet'})
-    df = df.rename(columns={'landtaxvaluedollarcnt': 'land_value', 'lotsizesquarefeet': 'lot_square_feet', 'regionidzip': 'zipcode'}, inplace=True) 
+    df = df.rename(columns={'calculatedfinishedsquarefeet': 'square_feet'}) 
 
 
     # Eliminate the funky values
