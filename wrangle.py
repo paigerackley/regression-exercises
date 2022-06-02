@@ -39,11 +39,12 @@ def wrangle_zillow():
     optimizes or fixes data types
     handles outliers w/ manual logic
     returns a clean dataframe
-    """
+    """ 
+    
+    # Acquire function 
     df = get_zillow_data()
 
     # Drop all nulls from dataset
-
     # Convert some columns to integers
     # fips, yearbuilt, and bedrooms can be integers
     df["fips"] = df["fips"].astype(int)
@@ -54,7 +55,7 @@ def wrangle_zillow():
     df = df.dropna()
 
     # readability
-    df = df.rename(columns={'calculatedfinishedsquarefeet': 'sqr_ft'})
+    df = df.rename(columns={'calculatedfinishedsquarefeet': 'square_feet'})
 
     # Eliminate the funky values
     df = df[df['calculatedfinishedsquarefeet'] > 400]
@@ -67,6 +68,10 @@ def wrangle_zillow():
     df = df[df['bedroomcnt'] > 0]
     df = df[df['bathroomcnt'] < 7]
     df = df[df['bedroomcnt'] < 7]
+
+     # Convert Fips to Names
+    df['fips_name'] = np.where(df.fips == 6037, 'Los Angeles', np.where(df.fips == 6059, 'Orange','Ventura') )
+    df = df.drop(columns = 'fips')
 
     return df
 
@@ -86,3 +91,33 @@ def train_validate_test_split(df, target, seed=123):
     return train, validate, test
 
 #### Scale #####
+def scale_data(train, 
+               validate, 
+               test, 
+               columns_to_scale=['bedroomcnt', 'bathroomcnt', 'taxvaluedollarcnt', 'calculatedfinishedsquarefeet'],
+               return_scaler=False):
+    '''
+    Scales the 3 data splits. 
+    Takes in train, validate, and test data splits and returns their scaled counterparts.
+    If return_scalar is True, the scaler object will be returned as well
+    '''
+    train_scaled = train.copy()
+    validate_scaled = validate.copy()
+    test_scaled = test.copy()
+    
+    scaler = MinMaxScaler()
+    scaler.fit(train[columns_to_scale])
+    
+    train_scaled[columns_to_scale] = pd.DataFrame(scaler.transform(train[columns_to_scale]),
+                                                  columns=train[columns_to_scale].columns.values).set_index([train.index.values])
+                                                  
+    validate_scaled[columns_to_scale] = pd.DataFrame(scaler.transform(validate[columns_to_scale]),
+                                                  columns=validate[columns_to_scale].columns.values).set_index([validate.index.values])
+    
+    test_scaled[columns_to_scale] = pd.DataFrame(scaler.transform(test[columns_to_scale]),
+                                                 columns=test[columns_to_scale].columns.values).set_index([test.index.values])
+    
+    if return_scaler:
+        return scaler, train_scaled, validate_scaled, test_scaled
+    else:
+        return train_scaled, validate_scaled, test_scaled
