@@ -32,49 +32,6 @@ def get_new_zillow_data():
     ###########################
 
 
-    #### Functions inside of wrangle ############
-
-
-def handle_nulls(df):    
-    # We keep 99.41% of the data after dropping nulls
-    # round(df.dropna().shape[0] / df.shape[0], 4) returned .9941
-    df = df.dropna()
-    return df
-
-
-def optimize_types(df):
-    # Convert some columns to integers
-    # fips, yearbuilt, and bedrooms can be integers
-    df["fips"] = df["fips"].astype(int)
-    df["yearbuilt"] = df["yearbuilt"].astype(int)
-    df["bedroomcnt"] = df["bedroomcnt"].astype(int)    
-    df["taxvaluedollarcnt"] = df["taxvaluedollarcnt"].astype(int)
-    df["calculatedfinishedsquarefeet"] = df["calculatedfinishedsquarefeet"].astype(int)
-
-    
-    # readability
-    df = df.rename(columns={'calculatedfinishedsquarefeet': 'sqr_ft'})
-    return df
-
-    
-
-def handle_outliers(df):
-     # Eliminate the funky values
-    df = df[df['calculatedfinishedsquarefeet'] > 400]
-    df = df[df['calculatedfinishedsquarefeet'] < 100000]
-    df = df[df['taxvaluedollarcnt'] > 10000]
-    df = df[df['taxvaluedollarcnt'] < 20000000]
-    df = df[df['taxamount'] > 100]
-    df = df[df['taxamount'] < 300000]
-    df = df[df['bathroomcnt'] > 0]
-    df = df[df['bedroomcnt'] > 0]
-    df = df[df['bathroomcnt'] < 7]
-    df = df[df['bedroomcnt'] < 7]
-
-    return df
-
-
-
 def wrangle_zillow():
     """
     Acquires Zillow data
@@ -85,13 +42,31 @@ def wrangle_zillow():
     """
     df = get_zillow_data()
 
-    df = handle_nulls(df)
+    # Drop all nulls from dataset
 
-    df = optimize_types(df)
+    # Convert some columns to integers
+    # fips, yearbuilt, and bedrooms can be integers
+    df["fips"] = df["fips"].astype(int)
+    df["yearbuilt"] = df["yearbuilt"].astype(int)
+    df["bedroomcnt"] = df["bedroomcnt"].astype(int)    
+    df["taxvaluedollarcnt"] = df["taxvaluedollarcnt"].astype(int)
+    df["calculatedfinishedsquarefeet"] = df["calculatedfinishedsquarefeet"].astype(int)
+    df = df.dropna()
 
-    df = handle_outliers(df)
+    # readability
+    df = df.rename(columns={'calculatedfinishedsquarefeet': 'sqr_ft'})
 
-    df.to_csv("zillow.csv", index=False)
+    # Eliminate the funky values
+    df = df[df['calculatedfinishedsquarefeet'] > 400]
+    df = df[df['calculatedfinishedsquarefeet'] < 100000]
+    df = df[df['taxvaluedollarcnt'] > 10000]
+    df = df[df['taxvaluedollarcnt'] < 20000000]
+    df = df[df['taxamount'] > 100]
+    df = df[df['taxamount'] < 300000]
+    df = df[df['bathroomcnt'] > 0]
+    df = df[df['bedroomcnt'] > 0]
+    df = df[df['bathroomcnt'] < 7]
+    df = df[df['bedroomcnt'] < 7]
 
     return df
 
@@ -109,3 +84,5 @@ def train_validate_test_split(df, target, seed=123):
     train, validate = train_test_split(train_validate, test_size=0.3,
                                        random_state=seed)
     return train, validate, test
+
+#### Scale #####
