@@ -58,8 +58,8 @@ def wrangle_zillow():
     df = df.rename(columns={'calculatedfinishedsquarefeet': 'square_feet'})
 
     # Eliminate the funky values
-    df = df[df['calculatedfinishedsquarefeet'] > 400]
-    df = df[df['calculatedfinishedsquarefeet'] < 100000]
+    df = df[df['square_feet'] > 400]
+    df = df[df['square_feet'] < 100000]
     df = df[df['taxvaluedollarcnt'] > 10000]
     df = df[df['taxvaluedollarcnt'] < 20000000]
     df = df[df['taxamount'] > 100]
